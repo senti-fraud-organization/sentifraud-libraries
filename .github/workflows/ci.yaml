@@ -1,0 +1,155 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: openjdk:17-jdk-alpine
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Maven cache
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: maven-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            maven-${{ runner.os }}-
+
+      - name: Build project
+        run: mvn clean package -DskipTests
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-artifacts
+          path: target/*.jar
+
+  test:
+    runs-on: ubuntu-latest
+    container: openjdk:17-jdk-alpine
+    needs: build
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Maven cache
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: maven-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            maven-${{ runner.os }}-
+
+      - name: Run tests
+        run: mvn test
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-results
+          path: target/surefire-reports/
+
+  obfuscate:
+    runs-on: ubuntu-latest
+    container: openjdk:17-jdk-alpine
+    needs: build
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Maven cache
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: maven-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            maven-${{ runner.os }}-
+
+      - name: Obfuscate code
+        run: mvn package -Pobfuscate
+
+      - name: Upload obfuscated artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: obfuscated-artifacts
+          path: target/*.jar
+
+  generate-docs:
+    runs-on: ubuntu-latest
+    container: openjdk:17-jdk-alpine
+    needs: build
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Maven cache
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: maven-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            maven-${{ runner.os }}-
+
+      - name: Generate Javadocs
+        run: mvn javadoc:javadoc
+
+      - name: Upload Javadocs
+        uses: actions/upload-artifact@v3
+        with:
+          name: javadocs
+          path: target/site/apidocs/
+
+  pages:
+    runs-on: ubuntu-latest
+    container: openjdk:17-jdk-alpine
+    needs: generate-docs
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Maven cache
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: maven-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            maven-${{ runner.os }}-
+
+      - name: Prepare GitHub Pages
+        run: |
+          mkdir -p public
+          cp -r target/site/apidocs/* public/
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: public
+
+  deploy-package:
+    runs-on: ubuntu-latest
+    container: openjdk:17-jdk-alpine
+    needs: [obfuscate, generate-docs]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Maven cache
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: maven-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            maven-${{ runner.os }}-
+
+      - name: Publish package
+        run: mvn deploy -DskipTests
