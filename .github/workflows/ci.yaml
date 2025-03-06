@@ -11,7 +11,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: openjdk:17-jdk-alpine
+    container: maven:3.9.6-eclipse-temurin-17
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -19,7 +19,7 @@ jobs:
       - name: Set up Maven cache
         uses: actions/cache@v3
         with:
-          path: ~/.m2/repository
+          path: /root/.m2/repository
           key: maven-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             maven-${{ runner.os }}-
@@ -28,14 +28,14 @@ jobs:
         run: mvn clean package -DskipTests
 
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: build-artifacts
           path: target/*.jar
 
   test:
     runs-on: ubuntu-latest
-    container: openjdk:17-jdk-alpine
+    container: maven:3.9.6-eclipse-temurin-17
     needs: build
     steps:
       - name: Checkout repository
@@ -44,7 +44,7 @@ jobs:
       - name: Set up Maven cache
         uses: actions/cache@v3
         with:
-          path: ~/.m2/repository
+          path: /root/.m2/repository
           key: maven-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             maven-${{ runner.os }}-
@@ -53,14 +53,14 @@ jobs:
         run: mvn test
 
       - name: Upload test results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: test-results
           path: target/surefire-reports/
 
   obfuscate:
     runs-on: ubuntu-latest
-    container: openjdk:17-jdk-alpine
+    container: maven:3.9.6-eclipse-temurin-17
     needs: build
     steps:
       - name: Checkout repository
@@ -69,7 +69,7 @@ jobs:
       - name: Set up Maven cache
         uses: actions/cache@v3
         with:
-          path: ~/.m2/repository
+          path: /root/.m2/repository
           key: maven-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             maven-${{ runner.os }}-
@@ -78,14 +78,14 @@ jobs:
         run: mvn package -Pobfuscate
 
       - name: Upload obfuscated artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: obfuscated-artifacts
           path: target/*.jar
 
   generate-docs:
     runs-on: ubuntu-latest
-    container: openjdk:17-jdk-alpine
+    container: maven:3.9.6-eclipse-temurin-17
     needs: build
     steps:
       - name: Checkout repository
@@ -94,7 +94,7 @@ jobs:
       - name: Set up Maven cache
         uses: actions/cache@v3
         with:
-          path: ~/.m2/repository
+          path: /root/.m2/repository
           key: maven-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             maven-${{ runner.os }}-
@@ -103,14 +103,14 @@ jobs:
         run: mvn javadoc:javadoc
 
       - name: Upload Javadocs
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: javadocs
           path: target/site/apidocs/
 
   pages:
     runs-on: ubuntu-latest
-    container: openjdk:17-jdk-alpine
+    container: maven:3.9.6-eclipse-temurin-17
     needs: generate-docs
     steps:
       - name: Checkout repository
@@ -119,7 +119,7 @@ jobs:
       - name: Set up Maven cache
         uses: actions/cache@v3
         with:
-          path: ~/.m2/repository
+          path: /root/.m2/repository
           key: maven-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             maven-${{ runner.os }}-
@@ -137,7 +137,7 @@ jobs:
 
   deploy-package:
     runs-on: ubuntu-latest
-    container: openjdk:17-jdk-alpine
+    container: maven:3.9.6-eclipse-temurin-17
     needs: [obfuscate, generate-docs]
     steps:
       - name: Checkout repository
@@ -146,7 +146,7 @@ jobs:
       - name: Set up Maven cache
         uses: actions/cache@v3
         with:
-          path: ~/.m2/repository
+          path: /root/.m2/repository
           key: maven-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             maven-${{ runner.os }}-
