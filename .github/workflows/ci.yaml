@@ -3,10 +3,10 @@ name: Maven CI
 on:
   push:
     branches:
-      - master
+      - master  # Trigger on push to the main branch
   pull_request:
     branches:
-      - master
+      - master  # Trigger on pull requests targeting the main branch
 
 jobs:
   build-and-publish:
@@ -19,7 +19,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          java-version: '21'  # Specify the Java version you are using
+          java-version: '17'  # Specify the Java version you are using
           distribution: 'temurin'
 
       - name: Build with Maven
