@@ -19,7 +19,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v4  # Updated to v4
         with:
-          java-version: '17'  # Specify the Java version
+          java-version: '21'  # Specify the Java version
           distribution: 'temurin'
 
       - name: Install Maven
