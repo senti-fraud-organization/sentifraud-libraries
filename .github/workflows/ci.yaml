@@ -34,9 +34,9 @@ jobs:
           echo "Test stage passed!"  # Just prints logs to pass the stage
 
       - name: Publish to GitHub Packages
-        run: mvn deploy -s settings.xml
+        run: mvn deploy  # Removed the settings.xml reference, using GITHUB_TOKEN for authentication
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # GitHub token automatically handles authentication
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4  # Updated to v4
