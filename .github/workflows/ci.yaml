@@ -28,11 +28,6 @@ jobs:
       - name: Build with Maven (skip tests)
         run: mvn -B clean package -DskipTests --file pom.xml  # Skip tests during build
 
-      - name: Test (just print logs to pass)
-        run: |
-          echo "Running test stage... (skipping actual tests)"
-          echo "Test stage passed!"  # Just prints logs to pass the stage
-
       - name: Publish to GitHub Packages
         run: mvn deploy  # Removed the settings.xml reference, using GITHUB_TOKEN for authentication
         env:
