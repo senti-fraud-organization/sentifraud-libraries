@@ -11,15 +11,23 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: maven:3.9.6-eclipse-temurin-17
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Install Maven
+        run: sudo apt-get update && sudo apt-get install -y maven
+
       - name: Set up Maven cache
         uses: actions/cache@v3
         with:
-          path: /root/.m2/repository
+          path: ~/.m2/repository
           key: maven-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             maven-${{ runner.os }}-
@@ -28,23 +36,31 @@ jobs:
         run: mvn clean package -DskipTests
 
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: build-artifacts
           path: target/*.jar
 
   test:
     runs-on: ubuntu-latest
-    container: maven:3.9.6-eclipse-temurin-17
     needs: build
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Install Maven
+        run: sudo apt-get update && sudo apt-get install -y maven
+
       - name: Set up Maven cache
         uses: actions/cache@v3
         with:
-          path: /root/.m2/repository
+          path: ~/.m2/repository
           key: maven-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             maven-${{ runner.os }}-
@@ -53,23 +69,31 @@ jobs:
         run: mvn test
 
       - name: Upload test results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: test-results
           path: target/surefire-reports/
 
   obfuscate:
     runs-on: ubuntu-latest
-    container: maven:3.9.6-eclipse-temurin-17
     needs: build
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Install Maven
+        run: sudo apt-get update && sudo apt-get install -y maven
+
       - name: Set up Maven cache
         uses: actions/cache@v3
         with:
-          path: /root/.m2/repository
+          path: ~/.m2/repository
           key: maven-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             maven-${{ runner.os }}-
@@ -78,23 +102,31 @@ jobs:
         run: mvn package -Pobfuscate
 
       - name: Upload obfuscated artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: obfuscated-artifacts
           path: target/*.jar
 
   generate-docs:
     runs-on: ubuntu-latest
-    container: maven:3.9.6-eclipse-temurin-17
     needs: build
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Install Maven
+        run: sudo apt-get update && sudo apt-get install -y maven
+
       - name: Set up Maven cache
         uses: actions/cache@v3
         with:
-          path: /root/.m2/repository
+          path: ~/.m2/repository
           key: maven-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             maven-${{ runner.os }}-
@@ -103,23 +135,31 @@ jobs:
         run: mvn javadoc:javadoc
 
       - name: Upload Javadocs
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: javadocs
           path: target/site/apidocs/
 
   pages:
     runs-on: ubuntu-latest
-    container: maven:3.9.6-eclipse-temurin-17
     needs: generate-docs
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Install Maven
+        run: sudo apt-get update && sudo apt-get install -y maven
+
       - name: Set up Maven cache
         uses: actions/cache@v3
         with:
-          path: /root/.m2/repository
+          path: ~/.m2/repository
           key: maven-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             maven-${{ runner.os }}-
@@ -137,16 +177,24 @@ jobs:
 
   deploy-package:
     runs-on: ubuntu-latest
-    container: maven:3.9.6-eclipse-temurin-17
     needs: [obfuscate, generate-docs]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Install Maven
+        run: sudo apt-get update && sudo apt-get install -y maven
+
       - name: Set up Maven cache
         uses: actions/cache@v3
         with:
-          path: /root/.m2/repository
+          path: ~/.m2/repository
           key: maven-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             maven-${{ runner.os }}-
