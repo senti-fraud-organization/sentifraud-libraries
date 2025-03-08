@@ -125,8 +125,8 @@ jobs:
 
       - name: Deploy Javadocs to GitHub Pages
         run: |
-          git config --global user.name "martourez21"
-          git config --global user.email "nestorabiawuh@gmail.com"
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
 
           # Create a temporary directory for the gh-pages branch
           mkdir -p gh-pages
@@ -134,9 +134,16 @@ jobs:
           # Copy the generated Javadocs to the gh-pages directory
           cp -r target/site/apidocs/* gh-pages/
 
-          # Checkout the gh-pages branch
-          git fetch origin gh-pages || true
-          git checkout -b gh-pages origin/gh-pages || git checkout --orphan gh-pages
+          # Check if the gh-pages branch exists
+          if git ls-remote --exit-code --heads origin gh-pages; then
+            # If the branch exists, check it out
+            git fetch origin gh-pages
+            git checkout gh-pages
+          else
+            # If the branch does not exist, create it as an orphan branch
+            git checkout --orphan gh-pages
+            git rm -rf . || true
+          fi
 
           # Remove existing files (except .git)
           git rm -rf . || true
@@ -145,6 +152,6 @@ jobs:
           cp -r gh-pages/* .
           git add .
 
-          # Commit and push the changes
+          # Commit and force-push the changes
           git commit -m "Deploy Javadocs for ${{ github.sha }}"
-          git push origin gh-pages
+          git push --force origin gh-pages
