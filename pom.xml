@@ -28,9 +28,12 @@
             <optional>true</optional>
         </dependency>
 
-        <!-- Lombok (for reducing boilerplate code) -->
+        <dependency>
+            <groupId>org.apache.kafka</groupId>
+            <artifactId>kafka-clients</artifactId>
+<!--            <version>3.7.0</version>-->
+        </dependency>
 
-        <!-- Spring Boot Starter Test (for testing) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
