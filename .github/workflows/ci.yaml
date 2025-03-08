@@ -84,6 +84,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Clean working directory
+        run: |
+          # Remove untracked files and directories
+          git clean -fd
+
       - name: Download Javadocs
         uses: actions/download-artifact@v4
         with:
