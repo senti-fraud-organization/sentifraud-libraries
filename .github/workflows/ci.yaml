@@ -125,8 +125,8 @@ jobs:
 
       - name: Deploy Javadocs to GitHub Pages
         run: |
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "actions@github.com"
+          git config --global user.name "martourez21"
+          git config --global user.email "nestorabiawuh@gmail.com"
 
           # Create a temporary directory for the gh-pages branch
           mkdir -p gh-pages
