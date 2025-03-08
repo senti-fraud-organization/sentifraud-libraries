@@ -129,16 +129,16 @@ jobs:
           git config --global user.email "actions@github.com"
 
           # Create a temporary directory for the gh-pages branch
-          mkdir -p gh-pages
+          mkdir -p gh-pages-temp
 
-          # Copy the generated Javadocs to the gh-pages directory
-          cp -r target/site/apidocs/* gh-pages/
+          # Copy the generated Javadocs to the temporary directory
+          cp -r target/site/apidocs/* gh-pages-temp/
 
           # Check if the gh-pages branch exists
           if git ls-remote --exit-code --heads origin gh-pages; then
             # If the branch exists, check it out
             git fetch origin gh-pages
-            git checkout gh-pages
+            git checkout gh-pages --
           else
             # If the branch does not exist, create it as an orphan branch
             git checkout --orphan gh-pages
@@ -149,7 +149,7 @@ jobs:
           git rm -rf . || true
 
           # Add the new Javadocs
-          cp -r gh-pages/* .
+          cp -r gh-pages-temp/* .
           git add .
 
           # Commit and force-push the changes
