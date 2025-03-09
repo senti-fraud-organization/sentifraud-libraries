@@ -88,6 +88,11 @@ jobs:
         run: |
           # Remove untracked files and directories
           git clean -fd
+          # Remove the gh-pages-temp directory if it exists
+          rm -rf gh-pages-temp
+
+      - name: Create gh-pages-temp directory
+        run: mkdir -p gh-pages-temp
 
       - name: Download Javadocs
         uses: actions/download-artifact@v4
